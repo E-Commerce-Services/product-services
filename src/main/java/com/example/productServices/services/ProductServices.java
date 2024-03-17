@@ -1,13 +1,13 @@
 package com.example.productServices.services;
 
+import com.example.productServices.commons.repositorycommons.CategoryRepositoryCommons;
+import com.example.productServices.commons.repositorycommons.ProductRepositoryCommons;
+import com.example.productServices.commons.validator.ProductEntityValidator;
 import com.example.productServices.dtos.server.ProductManipulationMappedDTO;
-import com.example.productServices.exceptions.CategoryNotFoundException;
-import com.example.productServices.exceptions.DuplicateProductException;
-import com.example.productServices.exceptions.ProductNotFoundException;
+import com.example.productServices.exceptions.DuplicateEntityException;
+import com.example.productServices.exceptions.EntityNotFoundException;
 import com.example.productServices.models.Product;
 import com.example.productServices.repository.ProductRepository;
-import com.example.productServices.commons.DBCommons;
-import com.example.productServices.commons.ValidationCommons;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,74 +16,73 @@ import org.springframework.stereotype.Service;
 public class ProductServices {
 
     private final ProductRepository productRepository;
-    private final DBCommons dbCommons;
-    private final ValidationCommons validationCommons;
+    private final CategoryRepositoryCommons categoryRepositoryCommons;
+    private final ProductRepositoryCommons productRepositoryCommons;
+    private final ProductEntityValidator productEntityValidator;
 
     @Autowired
     public ProductServices(ProductRepository productRepository,
-                           DBCommons dbCommons, ValidationCommons validationCommons){
+                           CategoryRepositoryCommons categoryRepositoryCommons,
+                           ProductRepositoryCommons productRepositoryCommons,
+                           ProductEntityValidator productEntityValidator){
         this.productRepository=productRepository;
-        this.dbCommons = dbCommons;
-        this.validationCommons = validationCommons;
+        this.categoryRepositoryCommons = categoryRepositoryCommons;
+        this.productRepositoryCommons=productRepositoryCommons;
+        this.productEntityValidator = productEntityValidator;
     }
 
-    private Product buildAndValidateProduct(ProductManipulationMappedDTO productManipulationMappedDTO)
-            throws CategoryNotFoundException, DuplicateProductException {
+    private Product buildProduct(ProductManipulationMappedDTO productManipulationMappedDTO)
+            throws EntityNotFoundException {
 
-        Product product=Product.builder()
+         return Product.builder()
                 .name(productManipulationMappedDTO.name())
                 .price(productManipulationMappedDTO.price())
                 .description(productManipulationMappedDTO.description())
                 .quantity(productManipulationMappedDTO.quantity())
-                .category(dbCommons.getCategoryOrNull(productManipulationMappedDTO.categoryId()))
+                .category(categoryRepositoryCommons.validateAndGetEntityOrNull(productManipulationMappedDTO.categoryId()))
                 .build();
 
-        validationCommons.validateEntity(product);
-
-        return product;
     }
 
 
     public Product createProduct(ProductManipulationMappedDTO productManipulationMappedDTO)
-            throws CategoryNotFoundException, DuplicateProductException {
+            throws DuplicateEntityException, EntityNotFoundException {
 
-        Product newProduct= buildAndValidateProduct(productManipulationMappedDTO);
+        Product newProduct= buildProduct(productManipulationMappedDTO);
 
-        return productRepository.save(newProduct);
+        return productRepositoryCommons.validateAndSaveEntity(newProduct);
 
     }
 
     public Product modifyProductDetails(Long productId, ProductManipulationMappedDTO productManipulationMappedDTO)
-            throws CategoryNotFoundException, ProductNotFoundException, DuplicateProductException {
+            throws EntityNotFoundException, DuplicateEntityException {
 
-        Product existingProduct = dbCommons.getProductOrNull(productId);
+        Product existingProduct = productEntityValidator.validateEntityExistenceAndReturn(productId);
 
         if(productManipulationMappedDTO.name()!=null) existingProduct.setName(productManipulationMappedDTO.name());
         if(productManipulationMappedDTO.categoryId()!=null) existingProduct.setCategory(
-                dbCommons.getCategoryOrNull(productManipulationMappedDTO.categoryId())
+                categoryRepositoryCommons.validateAndGetEntityOrNull(productManipulationMappedDTO.categoryId())
         );
         if(productManipulationMappedDTO.price()!=null) existingProduct.setPrice(productManipulationMappedDTO.price());
         if(productManipulationMappedDTO.description()!=null) existingProduct.setDescription(productManipulationMappedDTO.description());
         if(productManipulationMappedDTO.quantity()!=null) existingProduct.setQuantity(productManipulationMappedDTO.quantity());
 
-        validationCommons.validateEntity(existingProduct);
-
-        return productRepository.save(existingProduct);
+        return productRepositoryCommons.validateAndSaveEntity(existingProduct);
     }
 
     public Product replaceProduct(Long productId, ProductManipulationMappedDTO productManipulationMappedDTO)
-            throws CategoryNotFoundException, ProductNotFoundException, DuplicateProductException {
+            throws EntityNotFoundException, DuplicateEntityException {
 
-        validationCommons.validateProductExistence(productId);
+        productEntityValidator.validateEntityExistenceAndReturn(productId);
 
-        Product replacedProduct= buildAndValidateProduct(productManipulationMappedDTO);
+        Product replacedProduct= buildProduct(productManipulationMappedDTO);
         replacedProduct.setId(productId);
 
-        return productRepository.save(replacedProduct);
+        return productRepositoryCommons.validateAndSaveEntity(replacedProduct);
     }
 
-    public Product getProduct(Long productId) throws ProductNotFoundException {
-        return dbCommons.getProductOrNull(productId);
+    public Product getProduct(Long productId) throws EntityNotFoundException {
+        return productRepositoryCommons.validateAndGetEntityOrNull(productId);
     }
 
 }

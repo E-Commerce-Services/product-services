@@ -1,10 +1,11 @@
 package com.example.productServices.repository;
 
 import com.example.productServices.models.Category;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface CategoryRepository extends JpaRepository<Category, Long> {
+@Repository
+public interface CategoryRepository extends BaseRepository<Category> {
 
-    boolean existsCategoriesById(Long categoryId);
-    boolean existsCategoriesByName(String categoryName);
+    boolean existsByName(String categoryName);
+    boolean existsByIdNotAndName(Long Id,String name);
 }

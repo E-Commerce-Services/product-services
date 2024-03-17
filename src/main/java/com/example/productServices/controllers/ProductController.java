@@ -3,9 +3,9 @@ package com.example.productServices.controllers;
 import com.example.productServices.dtos.client.ProductManipulationRequestDTO;
 import com.example.productServices.dtos.client.ProductResponseDTO;
 import com.example.productServices.dtos.server.ProductManipulationMappedDTO;
-import com.example.productServices.exceptions.CategoryNotFoundException;
-import com.example.productServices.exceptions.DuplicateProductException;
-import com.example.productServices.exceptions.ProductNotFoundException;
+import com.example.productServices.exceptions.DuplicateEntityException;
+import com.example.productServices.exceptions.DuplicateProductNameException;
+import com.example.productServices.exceptions.EntityNotFoundException;
 import com.example.productServices.models.Product;
 import com.example.productServices.services.ProductServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class ProductController {
 
     @PostMapping()
     public ResponseEntity<ProductResponseDTO> createProduct(@RequestBody ProductManipulationRequestDTO productManipulationRequestDTO)
-            throws CategoryNotFoundException, DuplicateProductException {
+            throws DuplicateEntityException, EntityNotFoundException {
 
         Product product=productServices.createProduct(
                 ProductManipulationMappedDTO.fromClientDTO(productManipulationRequestDTO)
@@ -43,7 +43,7 @@ public class ProductController {
     public ResponseEntity<ProductResponseDTO> modifyProduct(
             @PathVariable Long product_id,
             @RequestBody ProductManipulationRequestDTO productManipulationRequestDTO
-    ) throws CategoryNotFoundException, ProductNotFoundException, DuplicateProductException {
+    ) throws DuplicateEntityException, EntityNotFoundException {
 
         Product product=productServices.modifyProductDetails(
                 product_id,
@@ -60,7 +60,7 @@ public class ProductController {
     public ResponseEntity<ProductResponseDTO> replaceProduct(
             @PathVariable Long product_id,
             @RequestBody ProductManipulationRequestDTO productManipulationRequestDTO
-    ) throws CategoryNotFoundException, ProductNotFoundException, DuplicateProductException {
+    ) throws DuplicateEntityException, EntityNotFoundException {
 
         Product product=productServices.replaceProduct(
                 product_id,
@@ -74,7 +74,7 @@ public class ProductController {
     }
 
     @GetMapping("/{product_id}")
-    public ResponseEntity<ProductResponseDTO> getProduct(@PathVariable Long product_id) throws ProductNotFoundException {
+    public ResponseEntity<ProductResponseDTO> getProduct(@PathVariable Long product_id) throws EntityNotFoundException {
 
         Product product=productServices.getProduct(product_id);
 

@@ -1,13 +1,11 @@
 package com.example.productServices.services;
 
+import com.example.productServices.commons.repositorycommons.CategoryRepositoryCommons;
+import com.example.productServices.commons.validator.CategoryEntityValidator;
 import com.example.productServices.dtos.server.CategoryManipulationMappedDTO;
-import com.example.productServices.exceptions.CategoryDeletionNotAllowed;
-import com.example.productServices.exceptions.CategoryNotFoundException;
-import com.example.productServices.exceptions.DuplicateCategoryException;
+import com.example.productServices.exceptions.*;
 import com.example.productServices.models.Category;
 import com.example.productServices.repository.CategoryRepository;
-import com.example.productServices.commons.DBCommons;
-import com.example.productServices.commons.ValidationCommons;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,49 +14,44 @@ import java.util.List;
 @Service
 public class CategoryServices {
     private final CategoryRepository categoryRepository;
-    private final DBCommons dbCommons;
-    private final ValidationCommons validationCommons;
+    private final CategoryRepositoryCommons categoryRepositoryCommons;
+    private final CategoryEntityValidator categoryEntityValidator;
 
     @Autowired
-    public CategoryServices(CategoryRepository categoryRepository, DBCommons dbCommons, ValidationCommons validationCommons){
+    public CategoryServices(CategoryRepository categoryRepository,
+                            CategoryRepositoryCommons categoryRepositoryCommons,
+                            CategoryEntityValidator categoryEntityValidator){
         this.categoryRepository=categoryRepository;
-        this.dbCommons = dbCommons;
-        this.validationCommons = validationCommons;
+        this.categoryRepositoryCommons = categoryRepositoryCommons;
+        this.categoryEntityValidator = categoryEntityValidator;
     }
 
-    private Category buildAndValidateCategory(CategoryManipulationMappedDTO categoryManipulationMappedDTO) throws DuplicateCategoryException {
+    private Category buildCategory(CategoryManipulationMappedDTO categoryManipulationMappedDTO)  {
 
-        Category category=Category.builder()
+        return Category.builder()
                 .name(categoryManipulationMappedDTO.name())
                 .build();
-
-        validationCommons.validateEntity(category);
-
-        return category;
     }
 
-    public Category createCategory(CategoryManipulationMappedDTO categoryManipulationMappedDTO) throws DuplicateCategoryException {
+    public Category createCategory(CategoryManipulationMappedDTO categoryManipulationMappedDTO) throws DuplicateEntityException {
 
-        Category newCategory=buildAndValidateCategory(categoryManipulationMappedDTO);
-
-        return categoryRepository.save(newCategory);
+        Category newCategory= buildCategory(categoryManipulationMappedDTO);
+        return categoryRepositoryCommons.validateAndSaveEntity(newCategory);
     }
 
-    public Category updateCategory(Long categoryId,CategoryManipulationMappedDTO categoryManipulationMappedDTO) throws CategoryNotFoundException, DuplicateCategoryException {
+    public Category updateCategory(Long categoryId,CategoryManipulationMappedDTO categoryManipulationMappedDTO) throws DuplicateEntityException, EntityNotFoundException {
 
-        validationCommons.validateCategoryExistence(categoryId);
-
-        Category updatedCategory=buildAndValidateCategory(categoryManipulationMappedDTO);
+        categoryEntityValidator.validateEntityExistenceAndReturn(categoryId);
+        Category updatedCategory= buildCategory(categoryManipulationMappedDTO);
         updatedCategory.setId(categoryId);
 
-        return categoryRepository.save(updatedCategory);
+        return categoryRepositoryCommons.validateAndSaveEntity(updatedCategory);
     }
 
-    public Category deleteCategory(Long categoryId) throws CategoryNotFoundException, CategoryDeletionNotAllowed {
+    public Category deleteCategory(Long categoryId) throws EntityNotFoundException, EntityDeletionNotAllowedException {
 
-        Category category= dbCommons.getCategoryOrNull(categoryId);
-        validationCommons.validateCategoryDeletable(categoryId);
-
+        Category category= categoryRepositoryCommons.validateAndGetEntityOrNull(categoryId);
+        categoryEntityValidator.validateEntityDeletable(category);
         categoryRepository.deleteById(categoryId);
 
         return category;

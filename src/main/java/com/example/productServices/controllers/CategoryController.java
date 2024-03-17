@@ -4,9 +4,7 @@ import com.example.productServices.dtos.client.CategoryManipulationRequestDTO;
 import com.example.productServices.dtos.client.CategoryResponseDTO;
 import com.example.productServices.dtos.client.CategoriesResponseDTO;
 import com.example.productServices.dtos.server.CategoryManipulationMappedDTO;
-import com.example.productServices.exceptions.CategoryDeletionNotAllowed;
-import com.example.productServices.exceptions.CategoryNotFoundException;
-import com.example.productServices.exceptions.DuplicateCategoryException;
+import com.example.productServices.exceptions.*;
 import com.example.productServices.models.Category;
 import com.example.productServices.services.CategoryServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +40,7 @@ public class CategoryController {
     public ResponseEntity<CategoryResponseDTO> createCategory(
             @RequestBody CategoryManipulationRequestDTO categoryManipulationRequestDTO
     )
-            throws DuplicateCategoryException {
+            throws DuplicateEntityException {
 
         Category category=categoryServices.createCategory(
                 CategoryManipulationMappedDTO.fromClientDTO(categoryManipulationRequestDTO)
@@ -58,7 +56,7 @@ public class CategoryController {
     public ResponseEntity<CategoryResponseDTO>  updateCategory(
             @PathVariable Long category_id,
             @RequestBody CategoryManipulationRequestDTO categoryManipulationRequestDTO
-    ) throws CategoryNotFoundException, DuplicateCategoryException {
+    ) throws DuplicateEntityException, EntityNotFoundException {
 
         Category updateCategory=categoryServices.updateCategory(
                 category_id,
@@ -74,7 +72,7 @@ public class CategoryController {
     @DeleteMapping("/{category_id}")
     public ResponseEntity<CategoryResponseDTO>  deleteCategory(
             @PathVariable Long category_id
-    ) throws CategoryNotFoundException, CategoryDeletionNotAllowed {
+    ) throws EntityDeletionNotAllowedException, EntityNotFoundException {
 
         Category deleteCategory=categoryServices.deleteCategory(category_id);
 

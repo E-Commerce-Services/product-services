@@ -13,50 +13,36 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class ExceptionHandlers {
 
     @ExceptionHandler
-    public ResponseEntity<ExceptionDTO> handleCategoryNotFoundException(CategoryNotFoundException categoryNotFoundException){
+    public ResponseEntity<ExceptionDTO> handleEntityNotFoundException(EntityNotFoundException exception){
+        String entityType=exception.getEntityType();
+
         ExceptionDTO exceptionDTO=new ExceptionDTO(
-                categoryNotFoundException.getMessage(),
-                "Check the category ID. It probably doesn't exist."
+                exception.getMessage(),
+                "The " + entityType.toLowerCase() + " you requested could not be found. Please try with different "+entityType.toLowerCase()
                 );
 
         return new ResponseEntity<>(exceptionDTO, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler
-    public ResponseEntity<ExceptionDTO> handleDuplicateProductException(DuplicateProductException duplicateProductException){
+    public ResponseEntity<ExceptionDTO> handleDuplicateEntityException(DuplicateEntityException exception){
+        String entityType=exception.getEntityType();
+        String field=exception.getField();
+
         ExceptionDTO exceptionDTO=new ExceptionDTO(
-                duplicateProductException.getMessage(),
-                "If you want to create another product, you need to change the name of the product"
-        );
-
-        return new ResponseEntity<>(exceptionDTO, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ExceptionDTO> handleDuplicateCategoryException(DuplicateCategoryException duplicateCategoryException){
-        ExceptionDTO exceptionDTO=new ExceptionDTO(
-                duplicateCategoryException.getMessage(),
-                "If you want to create another Category, you need to change the name of the category"
-        );
-
-        return new ResponseEntity<>(exceptionDTO, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ExceptionDTO> handleProductNotFoundException(ProductNotFoundException productNotFoundException){
-        ExceptionDTO exceptionDTO=new ExceptionDTO(
-                productNotFoundException.getMessage(),
-                "Product with specified ID might be deleted (or) not yet created"
+                exception.getMessage(),
+                "The " + entityType.toLowerCase() + " with same "+field.toLowerCase()+" already exist, "+"Please use a different "+field.toLowerCase()
         );
 
         return new ResponseEntity<>(exceptionDTO, HttpStatus.NOT_FOUND);
     }
 
+
     @ExceptionHandler
-    public ResponseEntity<ExceptionDTO> handleCategoryDeletionNotAllowed(CategoryDeletionNotAllowed categoryDeletionNotAllowed){
+    public ResponseEntity<ExceptionDTO> handleEntityDeletionNotAllowed(EntityDeletionNotAllowedException exception){
         ExceptionDTO exceptionDTO=new ExceptionDTO(
-                categoryDeletionNotAllowed.getMessage(),
-                "Please make sure none of the other entities are using this category and try again"
+                exception.getMessage(),
+                "The Deletion of "+exception.getEntityType()+" you requested cannot be processed"
         );
 
         return new ResponseEntity<>(exceptionDTO, HttpStatus.NOT_FOUND);
