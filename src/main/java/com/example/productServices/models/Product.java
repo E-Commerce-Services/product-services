@@ -3,7 +3,6 @@ package com.example.productServices.models;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -36,18 +35,12 @@ public class Product extends BaseModal{
     @Size(min=50,max = 500,message = "Description of the product should be between 50 to 500")
     private String description;
 
-    @Column(nullable = false)
-    @NotNull(message = "Quantity is mandatory field")
-    @Min(value = 0,message = "Quantity should be positive number or zero")
-    private Integer quantity;
-
     @Builder
-    public Product(Long id,String name, Category category, Double price, String description,Integer quantity) {
+    public Product(Long id,String name, Category category, Double price, String description) {
         super(id);
         this.name = name;
         this.category = category;
         this.price = price;
         this.description = description;
-        this.quantity=quantity;
     }
 }

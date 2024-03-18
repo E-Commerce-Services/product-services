@@ -38,7 +38,6 @@ public class ProductServices {
                 .name(productManipulationMappedDTO.name())
                 .price(productManipulationMappedDTO.price())
                 .description(productManipulationMappedDTO.description())
-                .quantity(productManipulationMappedDTO.quantity())
                 .category(categoryRepositoryCommons.validateAndGetEntityOrNull(productManipulationMappedDTO.categoryId()))
                 .build();
 
@@ -65,7 +64,6 @@ public class ProductServices {
         );
         if(productManipulationMappedDTO.price()!=null) existingProduct.setPrice(productManipulationMappedDTO.price());
         if(productManipulationMappedDTO.description()!=null) existingProduct.setDescription(productManipulationMappedDTO.description());
-        if(productManipulationMappedDTO.quantity()!=null) existingProduct.setQuantity(productManipulationMappedDTO.quantity());
 
         return productRepositoryCommons.validateAndSaveEntity(existingProduct);
     }

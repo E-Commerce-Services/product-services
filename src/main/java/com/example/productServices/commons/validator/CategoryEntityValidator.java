@@ -1,6 +1,6 @@
 package com.example.productServices.commons.validator;
 
-import com.example.productServices.commons.exceptionthrower.CategoryExceptionThrower;
+import com.example.productServices.commons.exceptioncreator.CategoryExceptionCreator;
 import com.example.productServices.exceptions.*;
 import com.example.productServices.models.Category;
 import com.example.productServices.repository.CategoryRepository;
@@ -16,7 +16,7 @@ public class CategoryEntityValidator extends EntityValidator<Category> {
     private final ProductRepository productRepository;
 
     @Autowired
-    public CategoryEntityValidator(CategoryRepository categoryRepository, ProductRepository productRepository, Validator validator, CategoryExceptionThrower categoryExceptionThrower) {
+    public CategoryEntityValidator(CategoryRepository categoryRepository, ProductRepository productRepository, Validator validator, CategoryExceptionCreator categoryExceptionThrower) {
         super(validator,categoryRepository,categoryExceptionThrower);
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;

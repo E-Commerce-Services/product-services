@@ -1,6 +1,6 @@
 package com.example.productServices.commons.validator;
 
-import com.example.productServices.commons.exceptionthrower.ProductExceptionThrower;
+import com.example.productServices.commons.exceptioncreator.ProductExceptionCreator;
 import com.example.productServices.exceptions.DuplicateEntityException;
 import com.example.productServices.exceptions.DuplicateProductNameException;
 import com.example.productServices.models.Product;
@@ -14,7 +14,7 @@ public class ProductEntityValidator extends EntityValidator<Product> {
     private final ProductRepository productRepository;
 
     @Autowired
-    public ProductEntityValidator(ProductExceptionThrower productExceptionThrower, ProductRepository productRepository, Validator validator) {
+    public ProductEntityValidator(ProductExceptionCreator productExceptionThrower, ProductRepository productRepository, Validator validator) {
         super(validator, productRepository,productExceptionThrower);
         this.productRepository = productRepository;
     }
