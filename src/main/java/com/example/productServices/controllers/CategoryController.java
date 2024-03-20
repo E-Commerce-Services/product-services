@@ -58,7 +58,7 @@ public class CategoryController {
             @RequestBody CategoryManipulationRequestDTO categoryManipulationRequestDTO
     ) throws DuplicateEntityException, EntityNotFoundException {
 
-        Category updateCategory=categoryServices.updateCategory(
+        Category updateCategory=categoryServices.modifyCategory(
                 category_id,
                 CategoryManipulationMappedDTO.fromClientDTO(categoryManipulationRequestDTO)
         );

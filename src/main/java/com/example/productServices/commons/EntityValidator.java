@@ -1,8 +1,7 @@
-package com.example.productServices.commons.validator;
+package com.example.productServices.commons;
 
-import com.example.productServices.commons.exceptioncreator.ExceptionCreator;
-import com.example.productServices.exceptions.DuplicateEntityException;
 import com.example.productServices.exceptions.EntityNotFoundException;
+import com.example.productServices.models.BaseModal;
 import com.example.productServices.repository.BaseRepository;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -11,23 +10,23 @@ import jakarta.validation.Validator;
 import java.util.Optional;
 import java.util.Set;
 
-abstract public class EntityValidator<T> {
+public class EntityValidator<T extends BaseModal> {
 
     private final Validator validator;
     private final BaseRepository<T> baseRepository;
-    private final ExceptionCreator<T> exceptionCreator;
+    private final EntityNotFoundExceptionProvider exceptionFactory;
 
-    public EntityValidator(Validator validator, BaseRepository<T> baseRepository, ExceptionCreator<T> exceptionCreator) {
+    public EntityValidator(Validator validator, BaseRepository<T> baseRepository, EntityNotFoundExceptionProvider exceptionFactory) {
         this.validator = validator;
         this.baseRepository = baseRepository;
-        this.exceptionCreator = exceptionCreator;
+        this.exceptionFactory = exceptionFactory;
     }
 
     public void validateEntityConstraints(T entity) throws ConstraintViolationException {
         Set<ConstraintViolation<T>> violations = validator.validate(entity);
 
         if (!violations.isEmpty())
-            throw exceptionCreator.createConstraintViolationException(violations);
+            throw new ConstraintViolationException(entity.getClass().getSimpleName()+" Constraints are violating",violations);
 
     }
 
@@ -35,10 +34,9 @@ abstract public class EntityValidator<T> {
         Optional<T> optionalEntity=baseRepository.findById(id);
 
         if(optionalEntity.isEmpty())
-            throw exceptionCreator.createEntityByIDNotFoundException(id);
+            throw exceptionFactory.createEntityNotFoundException(id);
 
         return optionalEntity.get();
     }
 
-    abstract public void validateEntity(T entity) throws DuplicateEntityException;
 }

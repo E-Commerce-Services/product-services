@@ -4,7 +4,6 @@ import com.example.productServices.dtos.client.ProductManipulationRequestDTO;
 import com.example.productServices.dtos.client.ProductResponseDTO;
 import com.example.productServices.dtos.server.ProductManipulationMappedDTO;
 import com.example.productServices.exceptions.DuplicateEntityException;
-import com.example.productServices.exceptions.DuplicateProductNameException;
 import com.example.productServices.exceptions.EntityNotFoundException;
 import com.example.productServices.models.Product;
 import com.example.productServices.services.ProductServices;
@@ -26,11 +25,11 @@ public class ProductController {
 
 
     @PostMapping()
-    public ResponseEntity<ProductResponseDTO> createProduct(@RequestBody ProductManipulationRequestDTO productManipulationRequestDTO)
+    public ResponseEntity<ProductResponseDTO> createProduct(@RequestBody ProductManipulationRequestDTO createProductRequestDto)
             throws DuplicateEntityException, EntityNotFoundException {
 
         Product product=productServices.createProduct(
-                ProductManipulationMappedDTO.fromClientDTO(productManipulationRequestDTO)
+                ProductManipulationMappedDTO.fromClientDTO(createProductRequestDto)
         );
 
         return new ResponseEntity<>(
